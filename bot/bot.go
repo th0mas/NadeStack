@@ -36,9 +36,8 @@ func messageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.HasPrefix("!steamdebug", m.Content) {
+	if strings.HasPrefix(m.Content, "!steamdebug") {
 		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s: no linked steam account`", m.Author.Username))
 	}
 
 }
-
