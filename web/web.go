@@ -8,21 +8,21 @@ import (
 
 // Web implements the `Service` interface
 type Web struct {
-	r  *gin.Engine
-	db *models.Models
+	r     *gin.Engine
+	model *models.Models
 }
 
 // Run runs the web service component
 func (w *Web) Run(c *config.Config, db *models.Models) {
-	w.db = db
+	w.model = db
 	r := gin.Default()
 
 	r.GET("/health", healthCheck)
 
-	r.GET("/steamurl", func(context *gin.Context) {
+	r.GET("/api/steamurl", func(context *gin.Context) {
 		getSteamAuthURL(context, c)
 	})
-	r.GET("/auth/callback", func(context *gin.Context) {
+	r.GET("/api/auth/callback", func(context *gin.Context) {
 		getSteamCallback(context, c)
 	})
 	w.r = r

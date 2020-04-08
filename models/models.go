@@ -1,11 +1,19 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"errors"
+	"github.com/jinzhu/gorm"
+	"strings"
+)
 
 type Action int
 
 const (
 	LinkSteamID Action = iota
+)
+
+const (
+	userNotFoundError = "models: user not found"
 )
 
 type User struct {
@@ -25,9 +33,13 @@ type DeepLink struct {
 	LinkAction Action
 }
 
-func (m *Models) GetUserByDiscordID(discordID string) (u *User) {
-	m.db.Where(&User{DiscordID: discordID}).First(u)
-	return
+func (m *Models) GetUserByDiscordID(discordID string) (*User, error) {
+	var err error
+	u := new(User)
+	if err = m.db.Where(&User{DiscordID: discordID}).First(u).Error; gorm.IsRecordNotFoundError(err) {
+		err = errors.New(userNotFoundError)
+	}
+	return u, err
 }
 
 func (m *Models) CreateUserFromDiscord(discordID, discordNickname, discordProfilePicURL string) *User {
@@ -45,4 +57,16 @@ func (m *Models) AddSteamIDToUser(u *User, steamID string, steamID64 uint64) {
 	m.db.Model(&u).Updates(User{SteamID: steamID, SteamID64: steamID64})
 
 	return
+}
+
+func (m *Models) getDeepLinkData(rune string) (d *DeepLink) {
+	m.db.Where(&DeepLink{ShortURL: rune}).First(d)
+	return
+}
+
+func (m *Models) CheckUserNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.HasSuffix(err.Error(), userNotFoundError)
 }

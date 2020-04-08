@@ -13,6 +13,7 @@ type Config struct {
 	Domain       string `yaml:"domain"`      // Domain is the domain and port the app is hosted on
 	DBUrl        string `yaml:"db_url"`      // The URI for the postgres database
 	DBType       string `yaml:"db_type"`     // The type of database either postgres or sqlite3
+	Debug        bool   `yaml:"debug"`
 }
 
 // LoadConfig loads a yaml config from a given location

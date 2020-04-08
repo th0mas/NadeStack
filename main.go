@@ -34,8 +34,8 @@ func main() {
 	// Run component services
 	// writing like this allows expansion in future.
 	services := []Service{
-		&web.Web{},
 		&bot.Bot{},
+		&web.Web{},
 	}
 
 	for _, s := range services {

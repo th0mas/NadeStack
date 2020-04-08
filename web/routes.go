@@ -19,3 +19,7 @@ func getSteamCallback(ctx *gin.Context, c *config.Config) {
 	}
 	ctx.String(200, "Successfully validated steam id: "+steamID)
 }
+
+func (w *Web) getDeeplinkInfo(ctx *gin.Context) {
+
+}
