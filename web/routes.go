@@ -5,12 +5,6 @@ import (
 	"github.com/th0mas/NadeStack/config"
 )
 
-func getSteamAuthURL(ctx *gin.Context, c *config.Config) {
-	ctx.JSON(200, gin.H{
-		"url: ": generateSteamOpenIdUrl(c).String(),
-	})
-}
-
 func getSteamCallback(ctx *gin.Context, c *config.Config) {
 	steamID, err := verifySteamCallback(ctx, c)
 
@@ -21,5 +15,13 @@ func getSteamCallback(ctx *gin.Context, c *config.Config) {
 }
 
 func (w *Web) getDeeplinkInfo(ctx *gin.Context) {
-
+	dl, err := w.model.GetDeepLinkData(ctx.Query("rune"))
+	if w.model.IsRecordNotFound(err) {
+		ctx.JSON(404, gin.H{
+			"error": "not found",
+		})
+	} else {
+		dl.Payload = generateSteamOpenIdUrl(w.conf).String()
+		ctx.JSON(200, dl)
+	}
 }

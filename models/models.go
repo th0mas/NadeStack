@@ -1,9 +1,9 @@
 package models
 
 import (
-	"errors"
+	"crypto/rand"
+	"encoding/base64"
 	"github.com/jinzhu/gorm"
-	"strings"
 )
 
 type Action int
@@ -13,7 +13,7 @@ const (
 )
 
 const (
-	userNotFoundError = "models: user not found"
+	notFoundError = "models: user not found"
 )
 
 type User struct {
@@ -31,14 +31,11 @@ type DeepLink struct {
 	UserID     uint
 	User       User
 	LinkAction Action
+	Payload    interface{} `gorm:"-"`
 }
 
-func (m *Models) GetUserByDiscordID(discordID string) (*User, error) {
-	var err error
-	u := new(User)
-	if err = m.db.Where(&User{DiscordID: discordID}).First(u).Error; gorm.IsRecordNotFoundError(err) {
-		err = errors.New(userNotFoundError)
-	}
+func (m *Models) GetUserByDiscordID(discordID string) (u *User, err error) {
+	err = m.db.Where(&User{DiscordID: discordID}).First(u).Error
 	return u, err
 }
 
@@ -59,14 +56,39 @@ func (m *Models) AddSteamIDToUser(u *User, steamID string, steamID64 uint64) {
 	return
 }
 
-func (m *Models) getDeepLinkData(rune string) (d *DeepLink) {
-	m.db.Where(&DeepLink{ShortURL: rune}).First(d)
-	return
+func (m *Models) CreateDeepLink(action Action, u *User) *DeepLink {
+	code := createUniqueCode()
+	d := &DeepLink{
+		ShortURL:   code,
+		UserID:     u.ID,
+		User:       *u,
+		LinkAction: action,
+	}
+	m.db.Create(d)
+	return d
 }
 
-func (m *Models) CheckUserNotFound(err error) bool {
-	if err == nil {
-		return false
+func (m *Models) GetDeepLinkData(rune string) (d *DeepLink, err error) {
+	d = &DeepLink{}
+	err = m.db.Where(&DeepLink{ShortURL: rune}).First(d).Error
+	m.db.Model(d).Related(&d.User)
+	return d, err
+}
+
+// IsRecordNotFound is a wrapper around the built in function
+func (m *Models) IsRecordNotFound(err error) bool {
+	return gorm.IsRecordNotFoundError(err)
+}
+
+// https://stackoverflow.com/a/39482484
+func createUniqueCode() string {
+	c := 10
+	b := make([]byte, c)
+	_, err := rand.Read(b)
+
+	if err != nil {
+		panic(err)
 	}
-	return strings.HasSuffix(err.Error(), userNotFoundError)
+
+	return base64.URLEncoding.EncodeToString(b)
 }

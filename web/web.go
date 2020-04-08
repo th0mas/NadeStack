@@ -10,18 +10,17 @@ import (
 type Web struct {
 	r     *gin.Engine
 	model *models.Models
+	conf  *config.Config
 }
 
 // Run runs the web service component
 func (w *Web) Run(c *config.Config, db *models.Models) {
 	w.model = db
+	w.conf = c
 	r := gin.Default()
 
 	r.GET("/health", healthCheck)
-
-	r.GET("/api/steamurl", func(context *gin.Context) {
-		getSteamAuthURL(context, c)
-	})
+	r.GET("/api/deeplink", w.getDeeplinkInfo)
 	r.GET("/api/auth/callback", func(context *gin.Context) {
 		getSteamCallback(context, c)
 	})

@@ -61,11 +61,12 @@ func (b *Bot) messageCreateHandler(s *discordgo.Session, m *discordgo.MessageCre
 }
 
 func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if _, e := b.models.GetUserByDiscordID(m.Author.ID); b.models.CheckUserNotFound(e) {
+	u, err := b.models.GetUserByDiscordID(m.Author.ID)
+	if b.models.IsRecordNotFound(err) {
 		if b.conf.Debug {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "`DEBUG: No user with Discord ID "+m.Author.ID+" creating user")
 		}
-		b.models.CreateUserFromDiscord(m.Author.ID, m.Author.Username, m.Author.Avatar)
+		u = b.models.CreateUserFromDiscord(m.Author.ID, m.Author.Username, m.Author.Avatar)
 	} else {
 		if b.conf.Debug {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "`DEBUG: User already exists, skipping create`")
@@ -75,5 +76,10 @@ func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate)
 	if err != nil {
 		panic(err)
 	}
-	_, _ = s.ChannelMessageSend(userChannel.ID, fmt.Sprintf("Yes this should be steam link"))
+
+	dl := b.models.CreateDeepLink(models.LinkSteamID, u)
+	if b.conf.Debug {
+		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`DEBUG: Created Deep Link with vals %+v`", dl))
+	}
+	_, _ = s.ChannelMessageSend(userChannel.ID, fmt.Sprintf("Click the link to link you accounts: %s/%s", b.conf.Domain, dl.ShortURL))
 }

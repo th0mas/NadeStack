@@ -2,9 +2,9 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 
-"github.com/th0mas/NadeStack/config"
+	"github.com/th0mas/NadeStack/config"
 )
 
 type Models struct {
