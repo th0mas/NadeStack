@@ -11,7 +11,10 @@ func Run(c *config.Config) {
 	r.GET("/health", healthCheck)
 
 	r.GET("/steamurl", func(context *gin.Context) {
-		GETSteamAuthURL(context, c)
+		getSteamAuthURL(context, c)
+	})
+	r.GET("/auth/callback", func(context *gin.Context) {
+		getSteamCallback(context, c)
 	})
 
 	_ = r.Run()
