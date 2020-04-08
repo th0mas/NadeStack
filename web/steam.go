@@ -26,7 +26,7 @@ var (
 )
 
 func generateSteamOpenIdUrl(c *config.Config) *url.URL {
-	callback, err := url.Parse(c.Domain + "/auth/callback")
+	callback, err := url.Parse(c.Domain + "/verify")
 	if err != nil {
 		panic(err)
 	}
@@ -60,7 +60,7 @@ func verifySteamCallback(ctx *gin.Context, c *config.Config) (string, error) {
 		return "", errors.New("wrong openID mode")
 	}
 
-	if ctx.Query("openid.return_to") != c.Domain+"/auth/callback" {
+	if ctx.Query("openid.return_to") != c.Domain+"/verify" {
 		return "", errors.New("wrong return to url")
 	}
 

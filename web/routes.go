@@ -9,9 +9,12 @@ func getSteamCallback(ctx *gin.Context, c *config.Config) {
 	steamID, err := verifySteamCallback(ctx, c)
 
 	if err != nil {
-		panic(err)
-	}
-	ctx.String(200, "Successfully validated steam id: "+steamID)
+		ctx.JSON(500, gin.H{"success": false, "error": err.Error()})
+	} else {
+	ctx.JSON(200, gin.H{
+		"success": true,
+		"steamID": steamID,
+	})}
 }
 
 func (w *Web) getDeeplinkInfo(ctx *gin.Context) {
