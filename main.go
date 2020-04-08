@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/th0mas/NadeStack/bot"
 	"github.com/th0mas/NadeStack/config"
+	"github.com/th0mas/NadeStack/models"
 	"github.com/th0mas/NadeStack/web"
 	"os"
 	"os/signal"
@@ -15,6 +16,11 @@ var (
 	ConfigPath string
 )
 
+type Service interface {
+	Run(c *config.Config, db *models.DB)
+	Close()
+}
+
 func init() {
 	flag.StringVar(&ConfigPath, "c", "config.yml", "Filepath to the config file")
 
@@ -23,16 +29,25 @@ func init() {
 
 func main() {
 	c := config.LoadConfig(ConfigPath)
+	db := models.Init(&c)
 
 	// Run component services
-	discordBot := bot.Run(&c)
-	web.Run(&c)
+	// writing like this allows expansion in future.
+	services := []Service{
+		&web.Web{},
+		&bot.Bot{},
+	}
+
+	for _, s := range services {
+		s.Run(&c, db)
+	}
 
 	// Safely close connections on close
 	sc := make(chan os.Signal)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
-	// safely close discod
-	_ = discordBot.Close()
+	for _, s := range services {
+		s.Close()
+	}
 }

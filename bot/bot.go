@@ -3,15 +3,23 @@ package bot
 import (
 	"fmt"
 	"github.com/th0mas/NadeStack/config"
+	"github.com/th0mas/NadeStack/models"
 	"log"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
+// Bot implements the `Service` interface
+type Bot struct {
+	d  *discordgo.Session
+	db *models.DB
+}
+
 // Run runs the discord-bot component of NadeStack
-func Run(c *config.Config) *discordgo.Session {
+func (b *Bot) Run(c *config.Config, db *models.DB) {
 	log.Println("Starting discord bot")
+	b.db = db
 
 	d, err := discordgo.New("Bot " + c.DiscordToken)
 
@@ -19,17 +27,21 @@ func Run(c *config.Config) *discordgo.Session {
 		panic(err)
 	}
 
-	d.AddHandler(messageCreateHandler)
+	d.AddHandler(b.messageCreateHandler)
 
 	err = d.Open()
 	if err != nil {
 		panic(err)
 	}
 
-	return d
+	b.d = d
 }
 
-func messageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (b *Bot) Close() {
+	_ = b.d.Close()
+}
+
+func (b *Bot) messageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the bot - probaly not important
 	if m.Author.ID == s.State.User.ID {
