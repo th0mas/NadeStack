@@ -13,11 +13,11 @@ import (
 // Bot implements the `Service` interface
 type Bot struct {
 	d  *discordgo.Session
-	db *models.DB
+	db *models.Models
 }
 
 // Run runs the discord-bot component of NadeStack
-func (b *Bot) Run(c *config.Config, db *models.DB) {
+func (b *Bot) Run(c *config.Config, db *models.Models) {
 	log.Println("Starting discord bot")
 	b.db = db
 

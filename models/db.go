@@ -1,33 +1,29 @@
 package models
 
 import (
-	"database/sql"
-	_ "github.com/lib/pq"
-	"github.com/th0mas/NadeStack/config"
+	"github.com/jinzhu/gorm"
+_ "github.com/jinzhu/gorm/dialects/postgres"
+
+"github.com/th0mas/NadeStack/config"
 )
 
-type DB struct {
-	db *sql.DB // Private database access hands off
+type Models struct {
+	db *gorm.DB // Private database access hands off
 }
 
 // Init initializes the database according to the config file
-func Init(c *config.Config) *DB {
-	db, err := sql.Open("postgres", c.DBUrl)
+func Init(c *config.Config) *Models {
+	db, err := gorm.Open("postgres", "host=localhost port=5432 user=tomh dbname=nadestack sslmode=disable")
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	d := &DB{db}
-
+	d := &Models{db}
+	db.AutoMigrate(&User{}, &DeepLink{}) // what could go wrong
 	return d
 }
 
 // Close closes the database connection when no longer needed
-func (d *DB) Close() {
-	_ = d.db.Close()
+func (m *Models) Close() {
+	_ = m.db.Close()
 }

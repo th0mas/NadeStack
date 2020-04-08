@@ -17,7 +17,7 @@ var (
 )
 
 type Service interface {
-	Run(c *config.Config, db *models.DB)
+	Run(c *config.Config, db *models.Models)
 	Close()
 }
 
@@ -50,4 +50,6 @@ func main() {
 	for _, s := range services {
 		s.Close()
 	}
+
+	db.Close()
 }

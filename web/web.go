@@ -9,11 +9,11 @@ import (
 // Web implements the `Service` interface
 type Web struct {
 	r  *gin.Engine
-	db *models.DB
+	db *models.Models
 }
 
 // Run runs the web service component
-func (w *Web) Run(c *config.Config, db *models.DB) {
+func (w *Web) Run(c *config.Config, db *models.Models) {
 	w.db = db
 	r := gin.Default()
 
