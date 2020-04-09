@@ -21,13 +21,10 @@ func LoadConfig(uri string) (c Config) {
 	viper.AddConfigPath(".")
 	viper.SetConfigType("yaml")
 
-	err := viper.ReadInConfig()
+	_ = viper.ReadInConfig()
 	viper.AutomaticEnv()
 	_ = viper.Unmarshal(&c)
 
-	if err != nil {
-		panic(err)
-	}
 
 	//err = yaml.UnmarshalStrict(dat, &c)
 	//if err != nil {
