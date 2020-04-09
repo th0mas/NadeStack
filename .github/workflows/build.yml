@@ -26,6 +26,8 @@ jobs:
       working-directory: ./web/nadestack-frontend/
       env: 
         NODE_ENV: production
-      run: yarn build
+      run: | 
+        yarn install
+        yarn build
       
       
