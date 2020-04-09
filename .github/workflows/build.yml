@@ -48,7 +48,7 @@ jobs:
         git commit -m "build"
         
     - name: Dokku deploy
-      uses: th0mas/dokku-github-action@4.0
+      uses: th0mas/dokku-github-action@master
       env:
         PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
