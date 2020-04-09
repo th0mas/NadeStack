@@ -79,7 +79,9 @@ func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate)
 
 	dl := b.models.CreateDeepLink(models.LinkSteamID, u)
 	if b.conf.Debug {
-		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`DEBUG: Created Deep Link with vals %+v`", dl))
+		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`DEBUG: Created Deep Link with vals %+v`", dl))
 	}
 	_, _ = s.ChannelMessageSend(userChannel.ID, fmt.Sprintf("Click the link to link you accounts: %s/%s", b.conf.Domain, dl.ShortURL))
+
+	_ = s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
 }
