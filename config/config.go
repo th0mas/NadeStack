@@ -22,7 +22,9 @@ func LoadConfig(uri string) (c Config) {
 	viper.SetConfigType("yaml")
 
 	_ = viper.ReadInConfig()
-	viper.AutomaticEnv()
+	viper.BindEnv("discord_token", "DISCORD_TOKEN")
+	viper.BindEnv("domain")
+	viper.BindEnv("database_url", "DATABASE_URL")
 	_ = viper.Unmarshal(&c)
 
 
