@@ -35,6 +35,7 @@ type DeepLink struct {
 }
 
 func (m *Models) GetUserByDiscordID(discordID string) (u *User, err error) {
+	u = &User{}
 	err = m.db.Where(&User{DiscordID: discordID}).First(u).Error
 	return u, err
 }
