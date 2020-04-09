@@ -23,6 +23,7 @@ type User struct {
 	SteamID64            uint64 `gorm:"unique"`
 	DiscordNickname      string
 	DiscordProfilePicURL string
+	DeepLinks            []DeepLink
 }
 
 type DeepLink struct {
@@ -62,7 +63,6 @@ func (m *Models) CreateDeepLink(action Action, u *User) *DeepLink {
 	d := &DeepLink{
 		ShortURL:   code,
 		UserID:     u.ID,
-		User:       *u,
 		LinkAction: action,
 	}
 	m.db.Create(d)

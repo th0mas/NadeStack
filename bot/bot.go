@@ -65,7 +65,6 @@ func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate)
 	if b.models.IsRecordNotFound(err) {
 		if b.conf.Debug {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "`DEBUG: No user with Discord ID "+m.Author.ID+" creating user")
-			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`DEBUG: User object: %+v", u))
 		}
 		u = b.models.CreateUserFromDiscord(m.Author.ID, m.Author.Username, m.Author.Avatar)
 	} else {
