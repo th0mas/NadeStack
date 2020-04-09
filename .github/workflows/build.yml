@@ -54,6 +54,7 @@ jobs:
         PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
         HOST: ${{ secrets.DOKKU_IP }}
         PROJECT: nadestack
+        FORCE_DEPLOY: true
         
       
       
