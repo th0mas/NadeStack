@@ -18,12 +18,11 @@ const (
 
 type User struct {
 	gorm.Model
-	DiscordID            string `gorm:"unique"`
-	SteamID              string `gorm:"unique"`
-	SteamID64            uint64 `gorm:"unique"`
+	DiscordID            string  `gorm:"unique"`
+	SteamID              *string `gorm:"unique"`
+	SteamID64            *uint64 `gorm:"unique"`
 	DiscordNickname      string
 	DiscordProfilePicURL string
-	DeepLinks            []DeepLink
 }
 
 type DeepLink struct {
@@ -53,7 +52,7 @@ func (m *Models) CreateUserFromDiscord(discordID, discordNickname, discordProfil
 }
 
 func (m *Models) AddSteamIDToUser(u *User, steamID string, steamID64 uint64) {
-	m.db.Model(&u).Updates(User{SteamID: steamID, SteamID64: steamID64})
+	m.db.Model(&u).Updates(User{SteamID: &steamID, SteamID64: &steamID64})
 
 	return
 }
