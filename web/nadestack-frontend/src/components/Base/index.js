@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
 } from "react-router-dom"
 
 import Login from './../LogIn'
@@ -15,7 +14,7 @@ export default () => {
       <div className='columns is-centered is-vcentered full-height'>
         <div className='column is-one-third'>
       <div className='box'>
-         <h1 className='title'>NadeStack <span role="img">🧨</span> <p className='is-size-7 has-text-grey-dark'>btec popflash</p></h1>
+         <h1 className='title'>NadeStack <span role="img" aria-label="dynamite">🧨</span> <p className='is-size-7 has-text-grey-dark'>btec popflash</p></h1>
         <Router>
           <Switch>
           <Route path='/verify'><Verify /></Route>
