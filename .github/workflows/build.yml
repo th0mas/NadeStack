@@ -34,6 +34,9 @@ jobs:
       run: |
         git add .
         git add --force web/nadestack-frontend/build/
+        git status
+        git config --global user.email "ci@githubactions"
+        git config --global user.name "CI"
         git commit -m "build"
         
     - name: Dokku deploy
