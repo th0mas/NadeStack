@@ -1,9 +1,9 @@
 package models
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-
 	"github.com/th0mas/NadeStack/config"
 )
 
@@ -13,7 +13,21 @@ type Models struct {
 
 // Init initializes the database according to the config file
 func Init(c *config.Config) *Models {
-	db, err := gorm.Open("postgres", "host=localhost port=5432 user=tomh dbname=nadestack sslmode=disable")
+	//u, err := url.Parse(c.DBUrl)
+	//if err != nil {
+	//	panic("could not parse db url")
+	//}
+	//var connStr string
+	//fmt.Printf("%s", u.Path)
+	//if v, p := u.User.Password() ; p {
+	//	connStr = fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s",
+	//		u.User.Username(), v, u.Host, u.Port(), u.Path)
+	//} else {
+	//	connStr = fmt.Sprintf("user=%s host=%s port=%s dbname=%s",
+	//		u.User.Username(), u.Host, u.Port(), u.Path)
+	//}
+	fmt.Println("Starting Database")
+	db, err := gorm.Open("postgres", c.DBUrl + "?sslmode=disable")
 	if err != nil {
 		panic(err)
 	}
