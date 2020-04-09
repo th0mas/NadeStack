@@ -25,6 +25,7 @@ func LoadConfig(uri string) (c Config) {
 	viper.BindEnv("discord_token", "DISCORD_TOKEN")
 	viper.BindEnv("domain")
 	viper.BindEnv("database_url", "DATABASE_URL")
+	viper.BindEnv("debug")
 	_ = viper.Unmarshal(&c)
 
 
