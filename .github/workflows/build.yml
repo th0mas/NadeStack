@@ -29,5 +29,21 @@ jobs:
       run: | 
         yarn install
         yarn build
+        
+    - name: add artifacts to git
+      run: |
+        git add .
+        git add --force web/nadestack-frontend/build/
+        git commit -m "build"
+        
+    - name: Dokku deploy
+      uses: vitalyliber/dokku-github-action@v3.0
+      env:
+        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
+        HOST: ${{ secrets.DOKKU_IP }}
+        PROJECT: nadestack
+        
+      
       
       
