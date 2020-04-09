@@ -22,6 +22,12 @@ jobs:
     
     - name: Setup Node JS
       uses: actions/setup-node@v1.4.1
+    - name: Cache
+      uses: actions/cache@v1.1.2
+      with:
+        path: ./web/nadestack-frontend/node_modules/
+        key: ${{ runner.os }}-node_modules
+       
     - name: Build JS files
       working-directory: ./web/nadestack-frontend/
       env: 
@@ -32,6 +38,8 @@ jobs:
         
     - name: add artifacts to git
       run: |
+        rm -rf .git/
+        git init
         git add .
         git add --force web/nadestack-frontend/build/
         git status
