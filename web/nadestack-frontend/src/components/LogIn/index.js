@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 export default () => {
-  var id = 'TEST'
   let { rune } = useParams()
   const [profileInfo, setProfileInfo] = useState({})
   const [isLoading, setIsLoading] = useState(true)
@@ -26,7 +25,8 @@ export default () => {
 
         <figure>
           <a href={profileInfo.Payload}>
-            <img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/steamworks_docs/english/sits_large_noborder.png" className="margin-auto"></img>
+            <img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/steamworks_docs/english/sits_large_noborder.png" className="margin-auto"
+            alt="steam login button"></img>
           </a>
         </figure>
 
