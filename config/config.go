@@ -1,32 +1,38 @@
 package config
 
 import (
-	"io/ioutil"
-
-	"gopkg.in/yaml.v2"
+	"github.com/spf13/viper"
 )
 
 // Config holds the configuration data for the bot
 type Config struct {
-	DiscordToken string `yaml:"bot_token"`   // DiscordToken is the Bot token used to authenticate with discord
-	AzureToken   string `yaml:"azure_token"` // AzureToken is used to authenticate with azure to provision game servers
-	Domain       string `yaml:"domain"`      // Domain is the domain and port the app is hosted on
-	DBUrl        string `yaml:"db_url"`      // The URI for the postgres database
-	DBType       string `yaml:"db_type"`     // The type of database either postgres or sqlite3
-	Debug        bool   `yaml:"debug"`
+	DiscordToken string `mapstructure:"discord_token"`   // DiscordToken is the Bot token used to authenticate with discord
+	AzureToken   string `mapstructure:"azure_token"` // AzureToken is used to authenticate with azure to provision game servers
+	Domain       string `mapstructure:"domain"`      // Domain is the domain and port the app is hosted on
+	DBUrl        string `mapstructure:"database_url"`      // The URI for the postgres database
+	DBType       string `mapstructure:"db_type"`     // The type of database either postgres or sqlite3
+	Debug        bool   `mapstructure:"debug"`
 }
 
 // LoadConfig loads a yaml config from a given location
 func LoadConfig(uri string) (c Config) {
-	dat, err := ioutil.ReadFile(uri)
+	viper.SetDefault("debug", false)
+	viper.SetConfigName("config.yml")
+	viper.AddConfigPath(".")
+	viper.SetConfigType("yaml")
+
+	err := viper.ReadInConfig()
+	viper.AutomaticEnv()
+	_ = viper.Unmarshal(&c)
+
 	if err != nil {
 		panic(err)
 	}
 
-	err = yaml.UnmarshalStrict(dat, &c)
-	if err != nil {
-		panic(err)
-	}
+	//err = yaml.UnmarshalStrict(dat, &c)
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	return
 }

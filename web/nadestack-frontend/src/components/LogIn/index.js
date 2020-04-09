@@ -8,7 +8,8 @@ export default () => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/deeplink?rune=${rune}`)
+    fetch(`/api/deeplink?rune=${rune}`)
+        .then(r => r.status === 200 ? r : Promise.reject())
       .then(r => r.json())
       .then(data => {
         setProfileInfo(data)

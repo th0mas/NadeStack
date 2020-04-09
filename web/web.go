@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/th0mas/NadeStack/config"
 	"github.com/th0mas/NadeStack/models"
@@ -18,13 +19,24 @@ func (w *Web) Run(c *config.Config, db *models.Models) {
 	w.model = db
 	w.conf = c
 	r := gin.Default()
-	r.Use(CORSMiddleware())
 
-	r.GET("/health", healthCheck)
-	r.GET("/api/deeplink", w.getDeeplinkInfo)
-	r.GET("/api/auth/callback", func(context *gin.Context) {
+	if w.conf.Debug {
+		r.Use(CORSMiddleware())
+	}
+	r.Use(static.Serve("/", static.LocalFile("./web/nadestack-frontend/build/", false)))
+	api := r.Group("/api")
+
+	api.GET("/health", healthCheck)
+	api.GET("/deeplink", w.getDeeplinkInfo)
+	api.GET("/auth/callback", func(context *gin.Context) {
 		getSteamCallback(context, c)
 	})
+
+	r.NoRoute(func(c *gin.Context) {
+		c.File("./web/nadestack-frontend/build/index.html")
+	})
+
+
 	w.r = r
 	_ = r.Run()
 }
@@ -38,6 +50,7 @@ func healthCheck(c *gin.Context) {
 	})
 }
 
+// Middleware function to make debugging easier
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")

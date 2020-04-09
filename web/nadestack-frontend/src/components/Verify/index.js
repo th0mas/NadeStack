@@ -7,7 +7,7 @@ export default () => {
   const [authState, setAuthState] = useState({})
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/auth/callback" + queryString)
+    fetch("api/auth/callback" + queryString)
     .then(resp => resp.json())
     .then((data) => {
       setIsLoading(false)

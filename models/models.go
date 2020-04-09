@@ -68,6 +68,7 @@ func (m *Models) CreateDeepLink(action Action, u *User) *DeepLink {
 	return d
 }
 
+// TODO: With no rune this exposes data
 func (m *Models) GetDeepLinkData(rune string) (d *DeepLink, err error) {
 	d = &DeepLink{}
 	err = m.db.Where(&DeepLink{ShortURL: rune}).First(d).Error
