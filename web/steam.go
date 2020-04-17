@@ -26,7 +26,7 @@ var (
 	openIDIdentifier = "http://specs.openid.net/auth/2.0/identifier_select"
 )
 
-func generateSteamOpenIdUrl(c *config.Config, uniqueID string) *url.URL {
+func generateSteamOpenIDUrl(c *config.Config, uniqueID string) *url.URL {
 	callback, err := url.Parse(c.Domain + "/verify/" + uniqueID)
 	if err != nil {
 		panic(err)
@@ -108,8 +108,23 @@ func verifySteamCallback(ctx *gin.Context, c *config.Config, d string) (string, 
 	}
 
 	steamID := regexp.MustCompile("\\D+").ReplaceAllString(ctx.Query("openid.claimed_id"), "")
-	fmt.Println(steamID)
 
 	return steamID, nil
+
+}
+
+// ConvertSteamID64toSteamID3 returns a SteamID3, e.g. STEAM_X:Y:Z when
+// given a steamID64
+func ConvertSteamID64toSteamID3(steamID64 uint64) string {
+	x := (steamID64 >> 56) & 0xFF
+	if x == 1 {
+		x = 0
+	} // Universe 1 is unusable
+
+	y := steamID64 & 1
+
+	z := (steamID64 >> 1) & 0x7FFFFFF
+
+	return fmt.Sprintf("STEAM_%d:%d:%d", x, y, z)
 
 }

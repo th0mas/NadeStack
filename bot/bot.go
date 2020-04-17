@@ -2,10 +2,11 @@ package bot
 
 import (
 	"fmt"
-	"github.com/th0mas/NadeStack/config"
-	"github.com/th0mas/NadeStack/models"
 	"log"
 	"strings"
+
+	"github.com/th0mas/NadeStack/config"
+	"github.com/th0mas/NadeStack/models"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -51,7 +52,7 @@ func (b *Bot) messageCreateHandler(s *discordgo.Session, m *discordgo.MessageCre
 	}
 
 	if strings.HasPrefix(m.Content, "/steamdebug") {
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s: no linked steam account`", m.Author.Username))
+		b.steamDebugCommand(s, m)
 	}
 
 	if strings.HasPrefix(m.Content, "/linksteam") {
@@ -84,4 +85,14 @@ func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate)
 	_, _ = s.ChannelMessageSend(userChannel.ID, fmt.Sprintf("Click the link to link you accounts: %s/%s", b.conf.Domain, dl.ShortURL))
 
 	_ = s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
+}
+
+func (b *Bot) steamDebugCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+	u, err := b.models.GetUserByDiscordID(m.Author.ID)
+	if err != nil {
+		s.ChannelMessageSend(m.ChannelID, "no user infomation found for discord id: "+m.Author.ID)
+	}
+
+	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Steam connection infomation: \n SteamID: `%s` \n SteamID64: '%d'",
+		*u.SteamID, u.SteamID64))
 }
