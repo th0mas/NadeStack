@@ -91,6 +91,7 @@ func (b *Bot) steamDebugCommand(s *discordgo.Session, m *discordgo.MessageCreate
 	u, err := b.models.GetUserByDiscordID(m.Author.ID)
 	if err != nil {
 		s.ChannelMessageSend(m.ChannelID, "no user infomation found for discord id: "+m.Author.ID)
+		return
 	}
 
 	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Steam connection infomation: \n SteamID: `%s` \n SteamID64: '%d'",
