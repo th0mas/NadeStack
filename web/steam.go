@@ -9,13 +9,14 @@ package web
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/th0mas/NadeStack/config"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/th0mas/NadeStack/config"
 )
 
 var (
@@ -25,8 +26,8 @@ var (
 	openIDIdentifier = "http://specs.openid.net/auth/2.0/identifier_select"
 )
 
-func generateSteamOpenIdUrl(c *config.Config) *url.URL {
-	callback, err := url.Parse(c.Domain + "/verify")
+func generateSteamOpenIdUrl(c *config.Config, uniqueID string) *url.URL {
+	callback, err := url.Parse(c.Domain + "/verify/" + uniqueID)
 	if err != nil {
 		panic(err)
 	}
@@ -55,13 +56,14 @@ func generateSteamOpenIdUrl(c *config.Config) *url.URL {
 	return steamURL
 }
 
-func verifySteamCallback(ctx *gin.Context, c *config.Config) (string, error) {
+func verifySteamCallback(ctx *gin.Context, c *config.Config, d string) (string, error) {
 	if ctx.Query("openid.mode") != "id_res" {
 		return "", errors.New("wrong openID mode")
 	}
-
-	if ctx.Query("openid.return_to") != c.Domain+"/verify" {
-		return "", errors.New("wrong return to url")
+	fmt.Println(ctx.Query("openid.return_to"))
+	fmt.Println(c.Domain + "/verify/" + d)
+	if ctx.Query("openid.return_to") != c.Domain+"/verify/"+d {
+		return "", errors.New("return_to has wrong discord_id")
 	}
 
 	vals := map[string]string{

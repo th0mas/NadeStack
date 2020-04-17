@@ -5,16 +5,18 @@ import (
 	"github.com/th0mas/NadeStack/config"
 )
 
-func getSteamCallback(ctx *gin.Context, c *config.Config) {
-	steamID, err := verifySteamCallback(ctx, c)
+func (w *Web) getSteamCallback(ctx *gin.Context, c *config.Config) {
+	actionID := ctx.Query("rune")
+	steamID, err := verifySteamCallback(ctx, c, actionID)
 
 	if err != nil {
 		ctx.JSON(500, gin.H{"success": false, "error": err.Error()})
 	} else {
-	ctx.JSON(200, gin.H{
-		"success": true,
-		"steamID": steamID,
-	})}
+		ctx.JSON(200, gin.H{
+			"success": true,
+			"steamID": steamID,
+		})
+	}
 }
 
 func (w *Web) getDeeplinkInfo(ctx *gin.Context) {
@@ -24,7 +26,7 @@ func (w *Web) getDeeplinkInfo(ctx *gin.Context) {
 			"error": "not found",
 		})
 	} else {
-		dl.Payload = generateSteamOpenIdUrl(w.conf).String()
+		dl.Payload = generateSteamOpenIdUrl(w.conf, ctx.Query("rune")).String()
 		ctx.JSON(200, dl)
 	}
 }

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 
 export default () => {
   var queryString = window.location.search
+  let { rune } = useParams()
 
   const [isLoading, setIsLoading] = useState(true)
   const [authState, setAuthState] = useState({})
 
   useEffect(() => {
-    fetch("api/auth/callback" + queryString)
+    fetch("/api/auth/callback" + queryString + `&rune=${rune}`)
     .then(resp => resp.json())
     .then((data) => {
       setIsLoading(false)
