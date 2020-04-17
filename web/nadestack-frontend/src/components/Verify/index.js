@@ -16,7 +16,7 @@ export default () => {
       setAuthState(data)
       console.log(data)
     })
-  }, [queryString])
+  }, [queryString, rune])
 
 
   return (
