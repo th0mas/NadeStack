@@ -89,7 +89,7 @@ func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate)
 
 func (b *Bot) steamDebugCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	u, err := b.models.GetUserByDiscordID(m.Author.ID)
-	if err != nil {
+	if err != nil || u.SteamID == nil {
 		s.ChannelMessageSend(m.ChannelID, "no user infomation found for discord id: "+m.Author.ID)
 		return
 	}
