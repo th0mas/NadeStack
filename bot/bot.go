@@ -40,6 +40,7 @@ func (b *Bot) Run(c *config.Config, db *models.Models) {
 	b.d = d
 }
 
+// Close closes the bots connection to discord
 func (b *Bot) Close() {
 	_ = b.d.Close()
 }
@@ -95,5 +96,5 @@ func (b *Bot) steamDebugCommand(s *discordgo.Session, m *discordgo.MessageCreate
 	}
 
 	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Steam connection infomation: \n SteamID: `%s` \n SteamID64: '%d'",
-		*u.SteamID, u.SteamID64))
+		*u.SteamID, *u.SteamID64))
 }

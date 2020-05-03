@@ -26,11 +26,11 @@ export default () => {
         <figure>
           <a href={profileInfo.Payload}>
             <img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/steamworks_docs/english/sits_large_noborder.png" className="margin-auto"
-            alt="steam login button"></img>
+    alt="steam login button"/>
           </a>
         </figure>
 
-        <br></br>
+        <br/>
         <p className='is-size-7 has-text-grey-dark'>Your SteamID will be shared with NadeStack. This does <b>not</b> give NadeStack access to your steam account.</p>
       </>
   )

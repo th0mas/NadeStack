@@ -7,6 +7,7 @@ import {
 
 import Login from './../LogIn'
 import Verify from './../Verify'
+import Home from './../Home'
 
 export default () => {
   return (
@@ -19,6 +20,7 @@ export default () => {
           <Switch>
           <Route path='/verify/:rune'><Verify /></Route>
           <Route path='/:rune'><Login /></Route>
+          <Route path='/' exact><Home /></Route>
           </Switch>
         </Router>
       </div>
