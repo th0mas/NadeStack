@@ -10,8 +10,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-const cmdPrefix = "/"
-
 // Bot implements the `Service` interface
 type Bot struct {
 	d      *discordgo.Session
@@ -70,11 +68,11 @@ func (b *Bot) messageCreateHandler(s *discordgo.Session, m *discordgo.MessageCre
 
 	cmd := strings.Split(strings.TrimSpace(m.Content), " ")
 
-	if !(strings.HasPrefix(cmd[0], cmdPrefix)) {
+	if !(strings.HasPrefix(cmd[0], b.conf.CmdPrefix)) {
 		return
 	}
 
-	fn, exists := b.commands[cmd[0][1:]]
+	fn, exists := b.commands[cmd[0][1:]] // omit the preceeding slash e.g. '/ping' -> 'ping'
 
 	if exists {
 		fn(s, m)

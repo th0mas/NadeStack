@@ -28,7 +28,19 @@ func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate)
 	if b.conf.Debug {
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`DEBUG: Created Deep Link with vals %+v`", dl))
 	}
-	s.ChannelMessageSend(userChannel.ID, fmt.Sprintf("Click the link to link you accounts: %s/%s", b.conf.Domain, dl.ShortURL))
+	//s.ChannelMessageSend(userChannel.ID, fmt.Sprintf("Click the link to link you accounts: %s/%s", b.conf.Domain, dl.ShortURL))
+	e := createEmbed("Link Steam Account", "To be able to use NadeStack, you must first link your Steam account.", fmt.Sprintf("%s/%s", b.conf.Domain, dl.ShortURL))
+	fmt.Println(e)
+
+	message, err := s.ChannelMessageSendEmbed(userChannel.ID, e)
+	if err != nil {
+		fmt.Println(message)
+		panic(err)
+	}
+
+	if err != nil {
+		panic(err)
+	}
 
 	s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
 }
