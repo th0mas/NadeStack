@@ -3,12 +3,15 @@ package models
 import (
 	"crypto/rand"
 	"encoding/base64"
+
 	"github.com/jinzhu/gorm"
 )
 
+// Action is a type defing a deeplink action
 type Action int
 
 const (
+	// LinkSteamID asks to link a steam ID to a user account
 	LinkSteamID Action = iota
 )
 

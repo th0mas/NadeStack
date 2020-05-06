@@ -60,7 +60,6 @@ func (b *Bot) addCommand(command string, handler commandHandler) {
 }
 
 func (b *Bot) messageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-
 	// Ignore all messages created by the bot - probaly not important
 	if m.Author.ID == s.State.User.ID {
 		return
