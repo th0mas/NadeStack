@@ -35,8 +35,10 @@ func (b *Bot) Run(c *config.Config, db *models.Models) {
 	}
 
 	// Register our own commands here
-	b.addCommand("steamdebug", b.steamDebugCommand)
+	b.addCommand("profile", b.profileCommand)
 	b.addCommand("linksteam", b.steamLinkCommand)
+	b.addCommand("start", b.start)
+	b.addCommand("updateprofile", b.updateCommand)
 
 	// Register a message handler with the discord API
 	d.AddHandler(b.messageCreateHandler)

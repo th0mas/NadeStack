@@ -3,6 +3,7 @@ package models
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
 )
@@ -17,6 +18,7 @@ const (
 
 const (
 	notFoundError = "models: user not found"
+	discordAvatarCdnUrl = "https://cdn.discordapp.com/avatars/"
 )
 
 type User struct {
@@ -26,6 +28,7 @@ type User struct {
 	SteamID64            *uint64 `gorm:"unique"`
 	DiscordNickname      string
 	DiscordProfilePicURL string
+	Games                []*Team `gorm:"many2many:user_teams;"`
 }
 
 type DeepLink struct {
@@ -43,11 +46,11 @@ func (m *Models) GetUserByDiscordID(discordID string) (u *User, err error) {
 	return u, err
 }
 
-func (m *Models) CreateUserFromDiscord(discordID, discordNickname, discordProfilePicURL string) *User {
+func (m *Models) CreateUserFromDiscord(discordID, discordNickname, avatarHash string) *User {
 	u := &User{
 		DiscordID:            discordID,
 		DiscordNickname:      discordNickname,
-		DiscordProfilePicURL: discordProfilePicURL,
+		DiscordProfilePicURL: discordAvatarCdnUrl + fmt.Sprintf("%s/%s.png", discordID, avatarHash),
 	}
 
 	m.db.Create(u)
@@ -60,6 +63,9 @@ func (m *Models) AddSteamIDToUser(u *User, steamID string, steamID64 uint64) {
 	return
 }
 
+func (m *Models) UpdateDiscordInfo(u *User, nickname, avatar string) {
+	m.db.Model(&u).Updates(User{DiscordNickname: nickname, DiscordProfilePicURL:discordAvatarCdnUrl + fmt.Sprintf("%s/%s.png", u.DiscordID, avatar)})
+}
 func (m *Models) CreateDeepLink(action Action, u *User) *DeepLink {
 	code := createUniqueCode()
 	d := &DeepLink{
@@ -86,7 +92,7 @@ func (m *Models) IsRecordNotFound(err error) bool {
 
 // https://stackoverflow.com/a/39482484
 func createUniqueCode() string {
-	c := 10
+	c := 8
 	b := make([]byte, c)
 	_, err := rand.Read(b)
 

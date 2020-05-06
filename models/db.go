@@ -22,7 +22,7 @@ func Init(c *config.Config) *Models {
 	}
 
 	d := &Models{db}
-	db.AutoMigrate(&User{}, &DeepLink{}, &Match{}, &Game{}) // what could go wrong
+	db.AutoMigrate(&User{}, &DeepLink{}, &Match{}, &Game{}, &Team{}) // what could go wrong
 	return d
 }
 

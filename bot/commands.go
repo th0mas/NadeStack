@@ -28,30 +28,47 @@ func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate)
 	if b.conf.Debug {
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`DEBUG: Created Deep Link with vals %+v`", dl))
 	}
-	//s.ChannelMessageSend(userChannel.ID, fmt.Sprintf("Click the link to link you accounts: %s/%s", b.conf.Domain, dl.ShortURL))
-	e := createEmbed("Link Steam Account", "To be able to use NadeStack, you must first link your Steam account.", fmt.Sprintf("%s/%s", b.conf.Domain, dl.ShortURL))
-	fmt.Println(e)
 
-	message, err := s.ChannelMessageSendEmbed(userChannel.ID, e)
-	if err != nil {
-		fmt.Println(message)
-		panic(err)
-	}
+	e := createLinkEmbed("Link Steam Account", "To be able to use NadeStack, you must first link your Steam account.", fmt.Sprintf("%s/%s", b.conf.Domain, dl.ShortURL))
 
-	if err != nil {
-		panic(err)
-	}
+	s.ChannelMessageSendEmbed(userChannel.ID, e)
 
 	s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
 }
 
-func (b *Bot) steamDebugCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (b *Bot) profileCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	u, err := b.models.GetUserByDiscordID(m.Author.ID)
 	if err != nil || u.SteamID == nil {
 		s.ChannelMessageSend(m.ChannelID, "no user infomation found for discord id: "+m.Author.ID)
 		return
 	}
 
-	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Steam connection infomation: \n SteamID: `%s` \n SteamID64: '%d'",
-		*u.SteamID, *u.SteamID64))
+	e := createUserInfoEmbed(u)
+	_, err = s.ChannelMessageSendEmbed(m.ChannelID, e)
+
+	if err != nil {
+		panic(err)
+	}
+
+}
+
+func (b *Bot) updateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+	u, err := b.models.GetUserByDiscordID(m.Author.ID)
+	if err != nil || u.SteamID == nil {
+		s.ChannelMessageSend(m.ChannelID, "no user infomation found for discord id: "+m.Author.ID)
+		return
+	}
+
+	b.models.UpdateDiscordInfo(u, m.Author.Username, m.Author.Avatar)
+}
+
+func (b *Bot) start(s *discordgo.Session, m *discordgo.MessageCreate) {
+	// start the server - info
+	e := createCSGOMatchEmbed("Creating CSGO server...", "This could take up to a minute to complete", "de_mirage")
+	message, err := s.ChannelMessageSendEmbed(m.ChannelID, e)
+	if err != nil {
+		fmt.Println(message)
+		panic(err)
+	}
+
 }
