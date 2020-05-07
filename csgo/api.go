@@ -31,9 +31,11 @@ type server struct {
 	Id      string
 	Booting bool
 	Ip      string
-	Ports   struct {
-		Game string
-	}
+	Ports   ports
+}
+
+type ports struct {
+	Game string
 }
 
 type API struct{}

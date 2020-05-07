@@ -18,7 +18,7 @@ type Match struct {
 	ID             string         `json:"matchid" gorm:"PRIMARY_KEY"`
 	NumMaps        int            `json:"num_maps"`
 	MapList        pq.StringArray `json:"map_list" gorm:"type:varchar(50)[]"`
-	SkipVeto       bool           `json:"skip_veto" gorm:"-"`
+	SkipVeto       bool           `json:"skip_veto"`
 	SideType       string         `json:"side_type"`
 	PlayersPerTeam int            `json:"players_per_team"`
 	CVars          pq.StringArray `json:"cvars" gorm:"type:varchar(256)[]"`

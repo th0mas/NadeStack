@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/th0mas/NadeStack/config"
@@ -19,6 +20,7 @@ func (w *Web) Run(c *config.Config, db *models.Models) {
 	w.model = db
 	w.conf = c
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	r.Use(static.Serve("/", static.LocalFile("./web/nadestack-frontend/build/", false)))
 	api := r.Group("/api")
