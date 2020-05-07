@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -56,6 +57,8 @@ func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []s
 	embed = createCSGOMatchEmbed("Creating 1v1", "Uploading info...", gameMap)
 	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
 	csgo.UploadPluginsToServer(serverID)
+	conf, _ := json.Marshal(match)
+	csgo.UploadJSONToServer(serverID, "config.json", conf, "file")
 
 	embed = createCSGOMatchEmbed("Creating 1v1", "Unpacking info...", gameMap)
 	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
@@ -70,7 +73,7 @@ func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []s
 	embed = createCSGOMatchEmbed("Creating 1v1", "Configuring server...", gameMap)
 	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
 
-	err = csgo.SendCommandToServer(serverID, fmt.Sprintf("get5_loadmatch_url https://nadestack.tomhaines.uk/api/match/?id=%s", match.ID))
+	err = csgo.SendCommandToServer(serverID, "get5_loadmatch config.json")
 
 	if err != nil {
 		s.ChannelMessageSend(m.ChannelID, "Failed to config server")

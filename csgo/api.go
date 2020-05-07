@@ -197,3 +197,39 @@ func uploadFileToServer(id, path string, file *os.File, field string) {
 	defer resp.Body.Close()
 
 }
+
+func UploadJSONToServer(id, path string, payload []byte, field string) {
+	client := http.DefaultClient
+	absUrl := fmt.Sprintf("%sgame-servers/%s/files/%s", baseUrl, id, path)
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(field, "config.json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	reader := bytes.NewReader(payload)
+
+	_, err = io.Copy(part, reader)
+
+	if err != nil {
+		panic(err)
+	}
+	writer.Close()
+
+
+	req, _ := http.NewRequest("POST", absUrl, body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.SetBasicAuth(user, pass)
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+
+}
