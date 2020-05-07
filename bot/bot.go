@@ -19,7 +19,7 @@ type Bot struct {
 	commands map[string]commandHandler
 }
 
-type commandHandler func(s *discordgo.Session, m *discordgo.MessageCreate)
+type commandHandler func(s *discordgo.Session, m *discordgo.MessageCreate, cmd []string)
 
 // Run runs the discord-bot component of NadeStack
 func (b *Bot) Run(c *config.Config, db *models.Models) {
@@ -38,6 +38,7 @@ func (b *Bot) Run(c *config.Config, db *models.Models) {
 	b.addCommand("profile", b.profileCommand)
 	b.addCommand("linksteam", b.steamLinkCommand)
 	b.addCommand("start", b.start)
+	b.addCommand("1v1", b.start1v1)
 	b.addCommand("updateprofile", b.updateCommand)
 
 	// Register a message handler with the discord API
@@ -76,7 +77,7 @@ func (b *Bot) messageCreateHandler(s *discordgo.Session, m *discordgo.MessageCre
 	fn, exists := b.commands[cmd[0][1:]] // omit the preceeding slash e.g. '/ping' -> 'ping'
 
 	if exists {
-		fn(s, m)
+		fn(s, m, cmd)
 	}
 
 }

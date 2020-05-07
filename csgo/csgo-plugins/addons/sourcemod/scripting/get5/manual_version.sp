@@ -1,0 +1,2 @@
+#define PLUGIN_VERSION "0.7.2-dev+491"
+#define COMMIT_STRING "478710d"

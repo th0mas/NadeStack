@@ -2,12 +2,12 @@ package bot
 
 import (
 	"fmt"
-
 	"github.com/bwmarrin/discordgo"
+	"github.com/th0mas/NadeStack/csgo"
 	"github.com/th0mas/NadeStack/models"
 )
 
-func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate, _ []string) {
 	u, err := b.models.GetUserByDiscordID(m.Author.ID)
 	if b.models.IsRecordNotFound(err) {
 		if b.conf.Debug {
@@ -36,7 +36,7 @@ func (b *Bot) steamLinkCommand(s *discordgo.Session, m *discordgo.MessageCreate)
 	s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
 }
 
-func (b *Bot) profileCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (b *Bot) profileCommand(s *discordgo.Session, m *discordgo.MessageCreate, _ []string) {
 	u, err := b.models.GetUserByDiscordID(m.Author.ID)
 	if err != nil || u.SteamID == nil {
 		s.ChannelMessageSend(m.ChannelID, "no user infomation found for discord id: "+m.Author.ID)
@@ -52,7 +52,7 @@ func (b *Bot) profileCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 }
 
-func (b *Bot) updateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (b *Bot) updateCommand(s *discordgo.Session, m *discordgo.MessageCreate, _ []string) {
 	u, err := b.models.GetUserByDiscordID(m.Author.ID)
 	if err != nil || u.SteamID == nil {
 		s.ChannelMessageSend(m.ChannelID, "no user infomation found for discord id: "+m.Author.ID)
@@ -62,7 +62,7 @@ func (b *Bot) updateCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	b.models.UpdateDiscordInfo(u, m.Author.Username, m.Author.Avatar)
 }
 
-func (b *Bot) start(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (b *Bot) start(s *discordgo.Session, m *discordgo.MessageCreate, _ []string) {
 	// start the server - info
 	e := createCSGOMatchEmbed("Creating CSGO server...", "This could take up to a minute to complete", "de_mirage")
 	message, err := s.ChannelMessageSendEmbed(m.ChannelID, e)
@@ -71,4 +71,24 @@ func (b *Bot) start(s *discordgo.Session, m *discordgo.MessageCreate) {
 		panic(err)
 	}
 
+	id, _ := csgo.CreateCSGOServer(10, "de_mirage", "test", b.conf.GSLT)
+
+	if b.conf.Debug {
+		s.ChannelMessageSend(m.ChannelID, "`starting server with id: "+id+"`")
+	}
+
+	csgo.UploadPluginsToServer(id)
+
+	if b.conf.Debug {
+		s.ChannelMessageSend(m.ChannelID, "`plugins uploaded`")
+	}
+
+	csgo.UnzipPlugins(id)
+	if b.conf.Debug {
+		s.ChannelMessageSend(m.ChannelID, "`plugins unzipped`")
+	}
+
+	return
+
 }
+

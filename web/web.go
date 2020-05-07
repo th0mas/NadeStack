@@ -25,6 +25,7 @@ func (w *Web) Run(c *config.Config, db *models.Models) {
 
 	api.GET("/health", healthCheck)
 	api.GET("/deeplink", w.getDeeplinkInfo)
+	api.GET("/match", w.getMatchInfo)
 	api.GET("/auth/callback", func(context *gin.Context) { // TODO: Doesn't need extra func
 		w.getSteamCallback(context, c)
 	})

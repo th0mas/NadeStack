@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/th0mas/NadeStack/bot"
 	"github.com/th0mas/NadeStack/config"
+	"github.com/th0mas/NadeStack/csgo"
 	"github.com/th0mas/NadeStack/models"
 	"github.com/th0mas/NadeStack/web"
 	"os"
@@ -34,6 +35,7 @@ func main() {
 	// Run component services
 	// writing like this allows expansion in future.
 	services := []Service{
+		&csgo.API{},
 		&bot.Bot{},
 		&web.Web{},
 	}

@@ -21,10 +21,10 @@ type Match struct {
 	SkipVeto       bool           `json:"skip_veto" gorm:"-"`
 	SideType       string         `json:"side_type"`
 	PlayersPerTeam int            `json:"players_per_team"`
-	CVars          []string       `json:"cvars" gorm:"-"`
+	CVars          pq.StringArray `json:"cvars" gorm:"type:varchar(256)[]"`
 	TeamOne        Team           `json:"team1"`
 	TeamOneID      uint
-	TeamTwo        Team           `json:"team2"`
+	TeamTwo        Team `json:"team2"`
 	TeamTwoID      uint
 }
 
@@ -33,8 +33,8 @@ type Match struct {
 type Team struct {
 	gorm.Model
 	Name           string   `json:"name"`
-	Players        []*User  `gorm:"many2many:user_teams;"`
-	PlayersSteamID []string `gorm:"-" json:"players"`
+	Players        []*User  `gorm:"many2many:user_teams;" json:"-"`
+	PlayersSteamID []string `gorm:"-" json:"players, omitempty"`
 	Score          *int
 }
 
@@ -75,6 +75,15 @@ func (m *Models) Create1v1(gameMap string, team1, team2 Team) *Match {
 	return match
 }
 
+func (m *Models) GetMatchByID(id string) (*Match, error) {
+	match := &Match{}
+	err := m.db.Set("gorm:auto_preload", true).Where(&Match{ID: id}).First(match).Error
+	//m.db.Model(match).Related(&match.TeamOne, "TeamOne")
+	//m.db.Model(match).Related(&match.TeamTwo, "TeamTwo")
+
+	return match, err
+}
+
 // CreateTeam initializes a csgo team
 func (m *Models) CreateTeam(users []*User) *Team {
 	t := &Team{
@@ -87,8 +96,8 @@ func (m *Models) CreateTeam(users []*User) *Team {
 
 // GenerateTeamIDS geneates a list of Steam IDS for members of the team
 func (m *Match) GenerateTeamIDS() {
-	m.TeamOne.PlayersSteamID = make([]string, 5)
-	m.TeamTwo.PlayersSteamID = make([]string, 5)
+	m.TeamOne.PlayersSteamID = make([]string, 0)
+	m.TeamTwo.PlayersSteamID = make([]string, 0)
 
 	for _, u := range m.TeamOne.Players {
 		m.TeamOne.PlayersSteamID = append(m.TeamOne.PlayersSteamID, *u.SteamID)

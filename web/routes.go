@@ -55,3 +55,16 @@ func (w *Web) getDeeplinkInfo(ctx *gin.Context) {
 		ctx.JSON(200, dl)
 	}
 }
+
+func (w *Web) getMatchInfo(ctx *gin.Context) {
+	matchID := ctx.Query("id")
+
+	m, err := w.model.GetMatchByID(matchID)
+	if err != nil {
+		ctx.JSON(404, gin.H{"error": "could not find match"})
+		return
+	}
+	m.GenerateTeamIDS()
+	ctx.JSON(200, m)
+	return
+}

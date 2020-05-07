@@ -17,7 +17,7 @@ const (
 )
 
 const (
-	notFoundError = "models: user not found"
+	notFoundError       = "models: user not found"
 	discordAvatarCdnUrl = "https://cdn.discordapp.com/avatars/"
 )
 
@@ -64,7 +64,7 @@ func (m *Models) AddSteamIDToUser(u *User, steamID string, steamID64 uint64) {
 }
 
 func (m *Models) UpdateDiscordInfo(u *User, nickname, avatar string) {
-	m.db.Model(&u).Updates(User{DiscordNickname: nickname, DiscordProfilePicURL:discordAvatarCdnUrl + fmt.Sprintf("%s/%s.png", u.DiscordID, avatar)})
+	m.db.Model(&u).Updates(User{DiscordNickname: nickname, DiscordProfilePicURL: discordAvatarCdnUrl + fmt.Sprintf("%s/%s.png", u.DiscordID, avatar)})
 }
 func (m *Models) CreateDeepLink(action Action, u *User) *DeepLink {
 	code := createUniqueCode()
