@@ -57,6 +57,8 @@ func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []s
 	embed = createCSGOMatchEmbed("Creating 1v1", "Uploading info...", gameMap)
 	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
 	csgo.UploadPluginsToServer(serverID)
+	
+	match.GenerateTeamIDS()
 	conf, _ := json.Marshal(match)
 	csgo.UploadJSONToServer(serverID, "config.json", conf, "file")
 
