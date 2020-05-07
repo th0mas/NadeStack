@@ -35,7 +35,7 @@ type server struct {
 }
 
 type ports struct {
-	Game string
+	Game json.Number
 }
 
 type API struct{}
@@ -119,7 +119,7 @@ func GetServerStatus(id string) (booting bool, ip string) {
 	s := &server{}
 	err = json.Unmarshal(body, s)
 
-	return s.Booting, s.Ip + s.Ports.Game
+	return s.Booting, s.Ip + ":" + s.Ports.Game.String()
 
 }
 
