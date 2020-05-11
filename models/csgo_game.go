@@ -7,28 +7,30 @@ type Game struct {
 	gorm.Model
 	Match    Match
 	MatchID  string
-	Status   status
+	Status   Status
 	ServerID *string
 	ServerIP *string
 }
 
-type status int
+type Status int
 
 const (
-	notStarted status = iota
-	serverUp
-	configDeployed
-	gameReady
-	inProgress
-	gameEnd
-	gameOver
+	NotStarted Status = iota
+	ServerProvisioned
+	ConfigUploaded
+	ConfigUnpacked
+	ServerStarted
+	ServerConfigured
+	GameReady
+	InProgress
+	GameOver
 )
 
 // MakeGame creates a game instance given a match
 func (m *Models) MakeGame(match *Match) *Game {
 	g := &Game{
 		MatchID: match.ID,
-		Status:  notStarted,
+		Status:  NotStarted,
 	}
 
 	m.db.Create(g)

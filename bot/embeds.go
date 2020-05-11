@@ -1,11 +1,75 @@
 package bot
 
 import (
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/th0mas/NadeStack/models"
 )
 
 const embedColour = 0xFF0000
+
+type csgoMatchEmbed struct {
+	gameType string
+	game     *models.Game
+
+	embedID string
+	embed   *discordgo.MessageEmbed
+}
+
+func createCsgoMatchEmbed(gameType string, g *models.Game) *csgoMatchEmbed {
+	c := &csgoMatchEmbed{
+		gameType: gameType,
+		game:     g,
+	}
+
+	return c
+}
+
+func (c *csgoMatchEmbed) buildFields() {
+	c.embed = &discordgo.MessageEmbed{
+		Title:       getTitleFromStatus(c.game.Status),
+		Description: getDescFromStatus(c.game.Status, *c.game.ServerIP),
+		Timestamp:   "",
+		Color:       0,
+		Footer:      nil,
+		Image:       nil,
+		Thumbnail:   nil,
+		Video:       nil,
+		Provider:    nil,
+		Author:      nil,
+		Fields:      nil,
+	}
+}
+
+func getTitleFromStatus(status models.Status) string {
+	if status >= models.GameReady {
+		return "Playing"
+	}
+	return "Creating"
+
+}
+
+func getDescFromStatus(status models.Status, ip interface{}) string {
+	// We return a description for whats gonna happen next as we switch on the current state of the server
+	// e.g. status = Not started -> "Provisioning server..." as the bot is currently provisioning a server
+	switch status {
+	case models.NotStarted:
+		return "Provisioning Server..."
+	case models.ServerProvisioned:
+		return "Uploading plugins & info..."
+	case models.ConfigUploaded:
+		return "Unpacking config and info..."
+	case models.ConfigUnpacked:
+		return "Starting server..."
+	case models.ServerStarted:
+		return "Configuring server...."
+	case models.ServerConfigured:
+		return fmt.Sprintf("`connect %s; password nadestack`", ip.(string))
+	}
+
+	return "No recognised status"
+}
 
 func createEmbedAuthor(s ...string) *discordgo.MessageEmbedAuthor {
 	name := "Nadestack"
@@ -29,30 +93,6 @@ func createLinkEmbed(title, description, url string) *discordgo.MessageEmbed {
 		// Footer: &discordgo.MessageEmbedFooter{
 		// 	Text: "NadeStack - create CSGO games on discord",
 		// },
-	}
-}
-
-func createCSGOMatchEmbed(title, description, gameMap string) *discordgo.MessageEmbed {
-	return &discordgo.MessageEmbed{
-		Author:      createEmbedAuthor("5v5 on " + gameMap),
-		Color:       embedColour,
-		Title:       title,
-		Description: description,
-
-		Fields: []*discordgo.MessageEmbedField{
-			{
-				Name:   "Team One",
-				Value:  "player 1 \n player 2 \n player 3 \n player 4 \n player 5\n",
-				Inline: true,
-			},
-			{
-				Name:   "Team Two",
-				Value:  "player 1 \n player 2 \n player 3 \n player 4 \n player 5\n",
-				Inline: true,
-			},
-		},
-		Thumbnail: &discordgo.MessageEmbedThumbnail{URL: "https://vignette.wikia.nocookie.net/cswikia/images/a/a7/CSGO_de_Mirage.jpg"},
-		Footer:    &discordgo.MessageEmbedFooter{Text: "Game ID: aaaaaaa"},
 	}
 }
 
