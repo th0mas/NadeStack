@@ -27,6 +27,7 @@ func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []s
 	p1, err := b.models.GetUserByDiscordID(m.Author.ID)
 	if err != nil {
 		s.ChannelMessageSend(m.ChannelID, "Error getting player 1")
+		return
 	}
 
 	if len(m.Mentions) != 1 {
@@ -37,7 +38,7 @@ func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []s
 	p2, err := b.models.GetUserByDiscordID(p2ID)
 	if err != nil {
 		s.ChannelMessageSend(m.ChannelID, "Error getting player 2")
-		//return
+		return
 	}
 	teamOne := b.models.CreateTeam([]*models.User{
 		p1,
