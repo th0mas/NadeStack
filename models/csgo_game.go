@@ -12,8 +12,10 @@ type Game struct {
 	ServerIP *string
 }
 
+// Status is the type for availiable game statuses
 type Status int
 
+// Define availiable game Status
 const (
 	NotStarted Status = iota
 	ServerProvisioned
@@ -44,4 +46,13 @@ func (m *Models) GetGame(id int) (*Game, error) {
 	err := m.db.First(g, id).Error
 
 	return g, err
+}
+
+// IncrementGameStatus sets the game status to the next status
+func (g *Game) IncrementGameStatus() {
+	if g.Status >= GameOver {
+		return
+	}
+	g.Status++
+	return
 }

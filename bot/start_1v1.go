@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/th0mas/NadeStack/csgo"
 	"github.com/th0mas/NadeStack/models"
-	"time"
 )
 
 func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []string) {
@@ -47,34 +48,40 @@ func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []s
 		p2,
 	})
 
+	// TODO: Refractor out into common funcs
+
 	match := b.models.Create1v1(gameMap, *teamOne, *teamTwo)
-
 	game := b.models.MakeGame(match)
-	fmt.Println(*game)
-	embed := createCSGOMatchEmbed("Creating 1v1", "Provisioning server...", gameMap)
-	status, _ := s.ChannelMessageSendEmbed(m.ChannelID, embed)
-	serverID, _ := csgo.CreateCSGOServer(5, gameMap, match.ID, b.conf.GSLT)
 
-	embed = createCSGOMatchEmbed("Creating 1v1", "Uploading info...", gameMap)
-	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
+	embed := initCsgoMatchEmbed(m.ChannelID, "1v1", game)
+	embed.create(s)
+
+	serverID, _ := csgo.CreateCSGOServer(5, gameMap, match.ID, b.conf.GSLT)
+	game.IncrementGameStatus()
+	game.ServerID = &serverID
+	embed.update(s)
+
+	game.IncrementGameStatus()
+	embed.update(s)
 	csgo.UploadPluginsToServer(serverID)
-	
+
 	match.GenerateTeamIDS()
 	conf, _ := json.Marshal(match)
 	csgo.UploadJSONToServer(serverID, "config.json", conf, "file")
 
-	embed = createCSGOMatchEmbed("Creating 1v1", "Unpacking info...", gameMap)
-	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
+	game.IncrementGameStatus()
+	embed.update(s)
 	csgo.UnzipPlugins(serverID)
 
-	embed = createCSGOMatchEmbed("Creating 1v1", "Starting server...", gameMap)
-	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
+	game.IncrementGameStatus()
+	embed.update(s)
 	csgo.StartServer(serverID)
 
-	serverIP, err := waitForServerIp(serverID)
+	serverIP, err := waitForServerIP(serverID)
 
-	embed = createCSGOMatchEmbed("Creating 1v1", "Configuring server...", gameMap)
-	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
+	game.ServerIP = &serverIP
+	game.IncrementGameStatus()
+	embed.update(s)
 
 	err = csgo.SendCommandToServer(serverID, "get5_loadmatch config.json")
 
@@ -82,22 +89,19 @@ func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []s
 		s.ChannelMessageSend(m.ChannelID, "Failed to config server")
 	}
 
-	embed = createCSGOMatchEmbed("Playing 1v1", "`" + serverIP +"; password nadestack`", gameMap)
-	s.ChannelMessageEditEmbed(m.ChannelID, status.ID, embed)
-
-
-
+	game.IncrementGameStatus()
+	embed.update(s)
 
 }
 
-func waitForServerIp(id string) (string, error) {
+func waitForServerIP(id string) (string, error) {
 	ch := make(chan string, 1)
 	defer close(ch)
 
 	go func() {
 		for {
-			if status, ip  := csgo.GetServerStatus(id); !status {
-				ch<- ip
+			if status, ip := csgo.GetServerStatus(id); !status {
+				ch <- ip
 				return
 			}
 			time.Sleep(2 * time.Second)
@@ -108,7 +112,7 @@ func waitForServerIp(id string) (string, error) {
 	defer timer.Stop()
 
 	select {
-	case ip := <- ch:
+	case ip := <-ch:
 		return ip, nil
 	case <-timer.C:
 		return "", errors.New("timed out waiting for serve to load")

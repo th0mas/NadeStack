@@ -5,13 +5,18 @@ export default () => {
   let { rune } = useParams()
   const [profileInfo, setProfileInfo] = useState({})
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setIsError] = useState({e: false, reason: ""})
 
   useEffect(() => {
     fetch(`/api/deeplink?rune=${rune}`)
-        .then(r => r.status === 200 ? r : Promise.reject())
+        .then(r => r.status === 200 ? r : Promise.reject(r.status))
       .then(r => r.json())
       .then(data => {
         setProfileInfo(data)
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        setIsError({e: true, reason: err})
         setIsLoading(false)
       })
 
@@ -19,6 +24,7 @@ export default () => {
 
   return (
     isLoading ? <h1>Loading.....</h1> :
+      error.e ? <p>There was an error loading this link :( Reason: <code>{error.reason}</code></p> :
       <>
         <h2 className="subtitle">Hi <b>{profileInfo.User.DiscordNickname}</b>, please login with Steam to link up your Discord account. This should
     only have to be done once.</h2>

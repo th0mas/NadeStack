@@ -14,12 +14,14 @@ type csgoMatchEmbed struct {
 	game     *models.Game
 
 	embedID string
+	channelID string
 	embed   *discordgo.MessageEmbed
 }
 
-func createCsgoMatchEmbed(gameType string, g *models.Game) *csgoMatchEmbed {
+func initCsgoMatchEmbed(channelID, gameType string, g *models.Game) *csgoMatchEmbed {
 	c := &csgoMatchEmbed{
 		gameType: gameType,
+		channelID: channelID,
 		game:     g,
 	}
 
@@ -28,8 +30,8 @@ func createCsgoMatchEmbed(gameType string, g *models.Game) *csgoMatchEmbed {
 
 func (c *csgoMatchEmbed) buildFields() {
 	c.embed = &discordgo.MessageEmbed{
-		Title:       getTitleFromStatus(c.game.Status),
-		Description: getDescFromStatus(c.game.Status, *c.game.ServerIP),
+		Title:       c.buildTitle(),
+		Description: c.getDesc(),
 		Timestamp:   "",
 		Color:       0,
 		Footer:      nil,
@@ -37,23 +39,25 @@ func (c *csgoMatchEmbed) buildFields() {
 		Thumbnail:   nil,
 		Video:       nil,
 		Provider:    nil,
-		Author:      nil,
+		Author:      createEmbedAuthor(),
 		Fields:      nil,
 	}
 }
 
-func getTitleFromStatus(status models.Status) string {
-	if status >= models.GameReady {
-		return "Playing"
+func (c *csgoMatchEmbed) buildTitle() string {
+	verb := "Creating"
+	if c.game.Status >= models.GameReady {
+		verb =  "Playing"
 	}
-	return "Creating"
+
+	return fmt.Sprintf("%s %s on %s", verb, c.gameType, c.game.Match.MapList[0])
 
 }
 
-func getDescFromStatus(status models.Status, ip interface{}) string {
+func (c *csgoMatchEmbed) getDesc() string {
 	// We return a description for whats gonna happen next as we switch on the current state of the server
 	// e.g. status = Not started -> "Provisioning server..." as the bot is currently provisioning a server
-	switch status {
+	switch c.game.Status {
 	case models.NotStarted:
 		return "Provisioning Server..."
 	case models.ServerProvisioned:
@@ -65,10 +69,20 @@ func getDescFromStatus(status models.Status, ip interface{}) string {
 	case models.ServerStarted:
 		return "Configuring server...."
 	case models.ServerConfigured:
-		return fmt.Sprintf("`connect %s; password nadestack`", ip.(string))
+		return fmt.Sprintf("`connect %s; password nadestack`", *c.game.ServerIP)
 	}
 
 	return "No recognised status"
+}
+
+func (c *csgoMatchEmbed) create(s *discordgo.Session) {
+	c.buildFields()
+	s.ChannelMessageSendEmbed(c.channelID, c.embed)
+}
+
+func (c *csgoMatchEmbed) update(s *discordgo.Session) {
+	c.buildFields()
+	s.ChannelMessageEditEmbed(c.channelID, c.embedID, c.embed)
 }
 
 func createEmbedAuthor(s ...string) *discordgo.MessageEmbedAuthor {

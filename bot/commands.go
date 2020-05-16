@@ -2,8 +2,8 @@ package bot
 
 import (
 	"fmt"
+
 	"github.com/bwmarrin/discordgo"
-	"github.com/th0mas/NadeStack/csgo"
 	"github.com/th0mas/NadeStack/models"
 )
 
@@ -64,31 +64,30 @@ func (b *Bot) updateCommand(s *discordgo.Session, m *discordgo.MessageCreate, _ 
 
 func (b *Bot) start(s *discordgo.Session, m *discordgo.MessageCreate, _ []string) {
 	// start the server - info
-	e := createCSGOMatchEmbed("Creating CSGO server...", "This could take up to a minute to complete", "de_mirage")
-	message, err := s.ChannelMessageSendEmbed(m.ChannelID, e)
-	if err != nil {
-		fmt.Println(message)
-		panic(err)
-	}
+	// e := createCSGOMatchEmbed("Creating CSGO server...", "This could take up to a minute to complete", "de_mirage")
+	// message, err := s.ChannelMessageSendEmbed(m.ChannelID, e)
+	// if err != nil {
+	// 	fmt.Println(message)
+	// 	panic(err)
+	// }
 
-	id, _ := csgo.CreateCSGOServer(10, "de_mirage", "test", b.conf.GSLT)
+	// id, _ := csgo.CreateCSGOServer(10, "de_mirage", "test", b.conf.GSLT)
 
-	if b.conf.Debug {
-		s.ChannelMessageSend(m.ChannelID, "`starting server with id: "+id+"`")
-	}
+	// if b.conf.Debug {
+	// 	s.ChannelMessageSend(m.ChannelID, "`starting server with id: "+id+"`")
+	// }
 
-	csgo.UploadPluginsToServer(id)
+	// csgo.UploadPluginsToServer(id)
 
-	if b.conf.Debug {
-		s.ChannelMessageSend(m.ChannelID, "`plugins uploaded`")
-	}
+	// if b.conf.Debug {
+	// 	s.ChannelMessageSend(m.ChannelID, "`plugins uploaded`")
+	// }
 
-	csgo.UnzipPlugins(id)
-	if b.conf.Debug {
-		s.ChannelMessageSend(m.ChannelID, "`plugins unzipped`")
-	}
+	// csgo.UnzipPlugins(id)
+	// if b.conf.Debug {
+	// 	s.ChannelMessageSend(m.ChannelID, "`plugins unzipped`")
+	// }
 
 	return
 
 }
-
