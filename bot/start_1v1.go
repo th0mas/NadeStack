@@ -1,10 +1,7 @@
 package bot
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/th0mas/NadeStack/csgo"
@@ -50,72 +47,17 @@ func (b *Bot) start1v1(s *discordgo.Session, m *discordgo.MessageCreate, cmd []s
 
 	// TODO: Refractor out into common funcs
 
+	s.ChannelMessageSend(m.ChannelID, "creating game")
 	match := b.models.Create1v1(gameMap, *teamOne, *teamTwo)
 	game := b.models.MakeGame(match)
 
+	s.ChannelMessageSend(m.ChannelID, "creating embed")
 	embed := initCsgoMatchEmbed(m.ChannelID, "1v1", game)
 	embed.create(s)
 
-	serverID, _ := csgo.CreateCSGOServer(5, gameMap, match.ID, b.conf.GSLT)
-	game.IncrementGameStatus()
-	game.ServerID = &serverID
-	embed.update(s)
-
-	game.IncrementGameStatus()
-	embed.update(s)
-	csgo.UploadPluginsToServer(serverID)
-
-	match.GenerateTeamIDS()
-	conf, _ := json.Marshal(match)
-	csgo.UploadJSONToServer(serverID, "config.json", conf, "file")
-
-	game.IncrementGameStatus()
-	embed.update(s)
-	csgo.UnzipPlugins(serverID)
-
-	game.IncrementGameStatus()
-	embed.update(s)
-	csgo.StartServer(serverID)
-
-	serverIP, err := waitForServerIP(serverID)
-
-	game.ServerIP = &serverIP
-	game.IncrementGameStatus()
-	embed.update(s)
-
-	err = csgo.SendCommandToServer(serverID, "get5_loadmatch config.json")
-
-	if err != nil {
-		s.ChannelMessageSend(m.ChannelID, "Failed to config server")
-	}
-
-	game.IncrementGameStatus()
-	embed.update(s)
-
-}
-
-func waitForServerIP(id string) (string, error) {
-	ch := make(chan string, 1)
-	defer close(ch)
-
-	go func() {
-		for {
-			if status, ip := csgo.GetServerStatus(id); !status {
-				ch <- ip
-				return
-			}
-			time.Sleep(2 * time.Second)
-		}
-	}()
-
-	timer := time.NewTimer(2 * time.Minute)
-	defer timer.Stop()
-
-	select {
-	case ip := <-ch:
-		return ip, nil
-	case <-timer.C:
-		return "", errors.New("timed out waiting for serve to load")
-	}
+	s.ChannelMessageSend(m.ChannelID, "running csgo service")
+	csgo.BuildCSGOServer(game, b.conf.GSLT, func(g *models.Game) {
+		embed.update(s)
+	})
 
 }
