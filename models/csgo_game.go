@@ -5,7 +5,7 @@ import "github.com/jinzhu/gorm"
 // Game is the lifecycle object for one csgo game
 type Game struct {
 	gorm.Model
-	Match    Match
+	Match    *Match
 	MatchID  string
 	Status   Status
 	ServerID *string
@@ -32,6 +32,7 @@ const (
 func (m *Models) MakeGame(match *Match) *Game {
 	g := &Game{
 		MatchID: match.ID,
+		Match:   match,
 		Status:  NotStarted,
 	}
 
