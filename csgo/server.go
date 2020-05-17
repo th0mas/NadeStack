@@ -39,7 +39,8 @@ func BuildCSGOServer(g *models.Game, GSLT string, statusCallback func(*models.Ga
 	g.IncrementGameStatus()
 	statusCallback(g)
 
-	*g.ServerIP, _ = waitForServerIP(id)
+	ip, _ := waitForServerIP(id)
+	g.ServerIP = &ip
 	g.IncrementGameStatus()
 	statusCallback(g)
 
